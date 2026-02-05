@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLY STORE - Beli Produk Digital Terpercaya</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
+</head>
+<body>
+    <!-- Background Effects -->
+    <div class="background-container">
+        <div class="sky-gradient"></div>
+        <div class="cloud"></div>
+        <div class="cloud"></div>
+        <div class="cloud"></div>
+    </div>
+    
+    <!-- Loader -->
+    <div class="loader" id="loader">
+        <div class="loader-spinner"></div>
+        <div class="loader-text">Memuat...</div>
+    </div>
+    
+    <!-- Top Taskbar -->
+    <div class="top-taskbar">
+        <div class="logo">
+            <span>FLY</span>
+            <span>STORE</span>
+        </div>
+        
+        <div class="search-container">
+            <i class="search-icon">🔍</i>
+            <input type="text" class="search-input" id="searchInput" placeholder="Cari produk...">
+        </div>
+        
+        <div class="balance-display" id="balanceDisplay">
+            <i>💰</i>
+            <span>Rp 0</span>
+        </div>
+        
+        <button class="account-btn ripple" id="accountBtn">
+            <span id="accountInitial">?</span>
+        </button>
+    </div>
+    
+    <!-- Bottom Navbar -->
+    <div class="bottom-navbar">
+        <div class="nav-item active" data-page="home">
+            <div class="nav-icon">🏠</div>
+            <div class="nav-label">Home</div>
+        </div>
+        <div class="nav-item" data-page="products">
+            <div class="nav-icon">📦</div>
+            <div class="nav-label">Produk</div>
+        </div>
+        <div class="nav-item" data-page="deposit">
+            <div class="nav-icon">💵</div>
+            <div class="nav-label">Deposit</div>
+        </div>
+        <div class="nav-item" data-page="transactions">
+            <div class="nav-icon">📋</div>
+            <div class="nav-label">Transaksi</div>
+        </div>
+        <div class="nav-item" data-page="account">
+            <div class="nav-icon">👤</div>
+            <div class="nav-label">Akun</div>
+        </div>
+    </div>
+    
+    <!-- Main Content Container -->
+    <div class="page-container" id="pageContainer">
+        <!-- Pages will be dynamically rendered here by JavaScript -->
+    </div>
+    
+    <!-- Modals -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Masuk ke Akun</h3>
+                <button class="modal-close" id="closeLoginModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Untuk simulasi, Anda bisa login sebagai:</p>
+                <div class="form-group mt-2">
+                    <label>Nama</label>
+                    <input type="text" class="form-control" id="loginName" value="User Demo">
+                </div>
+                <div class="form-group mt-2">
+                    <label>Email</label>
+                    <input type="email" class="form-control" id="loginEmail" value="demo@flystore.com">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="closeLoginModal2">Batal</button>
+                <button class="btn btn-primary" id="btnLoginSubmit">Masuk</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="paymentModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Konfirmasi Pembayaran</h3>
+                <button class="modal-close" id="closePaymentModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="paymentMessage">Apakah Anda yakin ingin membeli produk ini?</p>
+                <div id="paymentDetails"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="closePaymentModal2">Batal</button>
+                <button class="btn btn-primary" id="btnConfirmPayment">Ya, Lanjutkan</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
