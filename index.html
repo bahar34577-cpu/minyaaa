@@ -68,12 +68,165 @@
         </div>
     </div>
     
-    <!-- Main Content Container -->
-    <div class="page-container" id="pageContainer">
-        <!-- Pages will be dynamically rendered here by JavaScript -->
+    <!-- Main Content - SPA Pages -->
+    <div class="page-container">
+        <!-- HOME PAGE -->
+        <div class="page active" id="home-page">
+            <div class="page-title">
+                <i>🏠</i>
+                <span>Beranda</span>
+            </div>
+            
+            <div class="banner-slider">
+                <div class="banner-slide slide-1 active">🛒 Beli Produk Digital Terpercaya</div>
+                <div class="banner-slide slide-2">⚡ Proses Cepat & Aman</div>
+                <div class="banner-slide slide-3">💰 Deposit Mudah, Saldo Aman</div>
+            </div>
+            
+            <div class="cloud-card">
+                <h3 style="margin-bottom: 15px; color: var(--primary);">Kategori Produk</h3>
+                <div class="categories-grid" id="categoriesGrid">
+                    <!-- Categories will be populated by JS -->
+                </div>
+            </div>
+            
+            <div class="cloud-card">
+                <h3 style="margin-bottom: 15px; color: var(--primary);">Produk Populer</h3>
+                <div class="products-grid" id="popularProducts">
+                    <!-- Popular products will be populated by JS -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- PRODUCTS PAGE -->
+        <div class="page" id="products-page">
+            <div class="page-title">
+                <i>📦</i>
+                <span>Semua Produk</span>
+            </div>
+            
+            <div class="cloud-card">
+                <input type="text" class="form-control mb-2" id="productsSearch" placeholder="Cari produk...">
+                <div id="productsContainer">
+                    <!-- Products will be populated by JS -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- PRODUCT DETAIL PAGE -->
+        <div class="page" id="product-detail-page">
+            <!-- Product detail will be populated by JS -->
+        </div>
+        
+        <!-- DEPOSIT PAGE -->
+        <div class="page" id="deposit-page">
+            <div class="page-title">
+                <i>💵</i>
+                <span>Deposit Saldo</span>
+            </div>
+            
+            <div class="cloud-card">
+                <div id="depositFormContainer">
+                    <div class="deposit-form">
+                        <div class="form-group">
+                            <label>Nominal Deposit</label>
+                            <input type="number" class="form-control" id="depositAmount" placeholder="Masukkan nominal" min="10000" step="1000">
+                            <div class="amount-options">
+                                <div class="amount-option" data-amount="10000">10K</div>
+                                <div class="amount-option" data-amount="25000">25K</div>
+                                <div class="amount-option" data-amount="50000">50K</div>
+                                <div class="amount-option" data-amount="100000">100K</div>
+                                <div class="amount-option" data-amount="200000">200K</div>
+                                <div class="amount-option" data-amount="500000">500K</div>
+                                <div class="amount-option" data-amount="1000000">1JT</div>
+                                <div class="amount-option" data-amount="2000000">2JT</div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Metode Pembayaran</label>
+                            <div class="payment-methods">
+                                <div class="payment-method" data-method="qris">
+                                    <div class="payment-icon">🏷️</div>
+                                    <div>QRIS</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn-deposit ripple" id="btnCreatePayment">
+                            Buat Pembayaran QRIS
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="invoiceContainer" class="hidden">
+                    <!-- Invoice will be populated by JS -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- TRANSACTIONS PAGE -->
+        <div class="page" id="transactions-page">
+            <div class="page-title">
+                <i>📋</i>
+                <span>Riwayat Transaksi</span>
+            </div>
+            
+            <div class="cloud-card">
+                <div class="transaction-filters">
+                    <div class="transaction-filter active" data-filter="all">Semua</div>
+                    <div class="transaction-filter" data-filter="deposit">Deposit</div>
+                    <div class="transaction-filter" data-filter="purchase">Pembelian</div>
+                </div>
+                
+                <div class="transactions-list" id="transactionsList">
+                    <!-- Transactions will be populated by JS -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- ACCOUNT PAGE -->
+        <div class="page" id="account-page">
+            <div class="page-title">
+                <i>👤</i>
+                <span>Akun Saya</span>
+            </div>
+            
+            <div class="account-header">
+                <div class="account-avatar" id="accountAvatar">
+                    ?
+                </div>
+                <h2 class="account-name" id="accountName">Guest</h2>
+                <p class="account-email" id="accountEmail">guest@flystore.com</p>
+            </div>
+            
+            <div class="cloud-card account-balance-card">
+                <div class="balance-label">Saldo Anda</div>
+                <div class="balance-amount" id="accountBalance">Rp 0</div>
+            </div>
+            
+            <div class="account-actions">
+                <div class="account-action ripple" id="btnLogin">
+                    <div class="action-icon">🔐</div>
+                    <div>Masuk</div>
+                </div>
+                <div class="account-action ripple" id="btnLogout">
+                    <div class="action-icon">🚪</div>
+                    <div>Keluar</div>
+                </div>
+                <div class="account-action ripple" id="btnDepositFromAccount">
+                    <div class="action-icon">💰</div>
+                    <div>Deposit</div>
+                </div>
+                <div class="account-action ripple" id="btnTransactionsFromAccount">
+                    <div class="action-icon">📋</div>
+                    <div>Riwayat</div>
+                </div>
+            </div>
+        </div>
     </div>
     
-    <!-- Modals -->
+    <!-- MODALS -->
     <div class="modal-overlay" id="loginModal">
         <div class="modal">
             <div class="modal-header">
@@ -115,7 +268,7 @@
         </div>
     </div>
     
-    <!-- Toast Container -->
+    <!-- TOAST CONTAINER -->
     <div class="toast-container" id="toastContainer"></div>
     
     <script src="app.js"></script>
