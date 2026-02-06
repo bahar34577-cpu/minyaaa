@@ -2,7 +2,7 @@
 // DATA & STATE MANAGEMENT
 // ============================================
 
-// Produk data sesuai dengan daftar yang diberikan
+// Produk data
 const productsData = {
     "Streaming & Music": [
         { name: "Netflix", icon: "🎬", color: "#E50914" },
@@ -95,14 +95,6 @@ let appState = {
     activeInvoice: null
 };
 
-// Konfigurasi API PaksaSir
-const PAKSASIR_CONFIG = {
-    API_KEY: 'ES4mWVwOTQC5zp1TYheedHcJlgt4bq7o',
-    SLUG: 'liviaa-chantika',
-    BASE_URL: 'https://paksa.sir', // Ganti dengan URL API PaksaSir yang sebenarnya
-    CALLBACK_URL: window.location.origin + '/callback' // Untuk verifikasi pembayaran
-};
-
 // Warna untuk kategori
 const categoryColors = {
     "Streaming & Music": "#FF6B9D",
@@ -123,7 +115,7 @@ const categoryIcons = {
     "Others": "📦"
 };
 
-// Deskripsi produk berdasarkan kategori
+// Deskripsi produk
 const productDescriptions = {
     "Streaming & Music": "Akses premium layanan streaming musik dan video tanpa iklan dengan kualitas terbaik.",
     "Editing": "Aplikasi editing foto dan video premium dengan fitur lengkap dan template eksklusif.",
@@ -135,7 +127,6 @@ const productDescriptions = {
 
 // Paket harga untuk setiap produk
 const generatePackages = (productName, category) => {
-    // Harga dasar berdasarkan kategori
     let basePrice = 0;
     switch(category) {
         case "Streaming & Music": basePrice = 25000; break;
@@ -146,7 +137,6 @@ const generatePackages = (productName, category) => {
         case "Others": basePrice = 20000; break;
     }
     
-    // Penyesuaian berdasarkan nama produk tertentu
     if (productName.includes("Netflix") || productName.includes("Spotify") || productName.includes("Youtube")) {
         basePrice = 35000;
     }
@@ -189,7 +179,7 @@ const generatePackages = (productName, category) => {
     ];
 };
 
-// Durasi proses berdasarkan kategori
+// Durasi proses
 const getProcessTime = (category) => {
     switch(category) {
         case "Streaming & Music": return "5-30 menit";
@@ -206,32 +196,19 @@ const getProcessTime = (category) => {
 // ============================================
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Inisialisasi state dari localStorage
     loadStateFromStorage();
-    
-    // Setup event listeners
     setupEventListeners();
-    
-    // Setup routing
     setupRouting();
-    
-    // Render halaman awal
     renderHomePage();
     updateBalanceDisplay();
     updateUserDisplay();
-    
-    // Setup banner slider
     setupBannerSlider();
-    
-    // Generate sparkle efek
     generateSparkles();
-    
-    // Update transaksi display
     updateTransactionsDisplay();
 });
 
 // ============================================
-// STATE MANAGEMENT FUNCTIONS
+// STATE MANAGEMENT
 // ============================================
 
 function loadStateFromStorage() {
@@ -245,7 +222,6 @@ function loadStateFromStorage() {
     appState.transactions = storedTransactions ? JSON.parse(storedTransactions) : [];
     appState.invoices = storedInvoices ? JSON.parse(storedInvoices) : [];
     
-    // Set default user jika tidak ada
     if (!appState.user) {
         appState.user = {
             name: "Guest",
@@ -267,32 +243,6 @@ function saveStateToStorage() {
 // ============================================
 
 function renderHomePage() {
-    const pageContainer = document.getElementById('pageContainer');
-    pageContainer.innerHTML = `
-        <div class="page active" id="home-page">
-            <div class="page-title">
-                <i>🏠</i>
-                <span>Beranda</span>
-            </div>
-            
-            <div class="banner-slider">
-                <div class="banner-slide slide-1 active">🛒 Beli Produk Digital Terpercaya</div>
-                <div class="banner-slide slide-2">⚡ Proses Cepat & Aman</div>
-                <div class="banner-slide slide-3">💰 Deposit Mudah, Saldo Aman</div>
-            </div>
-            
-            <div class="cloud-card">
-                <h3 style="margin-bottom: 15px; color: var(--primary);">Kategori Produk</h3>
-                <div class="categories-grid" id="categoriesGrid"></div>
-            </div>
-            
-            <div class="cloud-card">
-                <h3 style="margin-bottom: 15px; color: var(--primary);">Produk Populer</h3>
-                <div class="products-grid" id="popularProducts"></div>
-            </div>
-        </div>
-    `;
-    
     // Render kategori
     const categoriesGrid = document.getElementById('categoriesGrid');
     categoriesGrid.innerHTML = '';
@@ -309,21 +259,18 @@ function renderHomePage() {
         `;
         categoryItem.addEventListener('click', () => {
             navigateToPage('products');
-            // Filter produk berdasarkan kategori
             setTimeout(() => {
-                const searchInput = document.getElementById('searchInput');
-                if (searchInput) searchInput.value = category;
+                document.getElementById('productsSearch').value = category;
                 filterProducts();
             }, 300);
         });
         categoriesGrid.appendChild(categoryItem);
     });
     
-    // Render produk populer (6 produk random)
+    // Render produk populer
     const popularProducts = document.getElementById('popularProducts');
     popularProducts.innerHTML = '';
     
-    // Kumpulkan semua produk
     let allProducts = [];
     Object.keys(productsData).forEach(category => {
         productsData[category].forEach(product => {
@@ -331,7 +278,6 @@ function renderHomePage() {
         });
     });
     
-    // Ambil 6 produk random
     const shuffled = allProducts.sort(() => 0.5 - Math.random());
     const selectedProducts = shuffled.slice(0, 6);
     
@@ -342,21 +288,6 @@ function renderHomePage() {
 }
 
 function renderProductsPage(filter = '') {
-    const pageContainer = document.getElementById('pageContainer');
-    pageContainer.innerHTML = `
-        <div class="page active" id="products-page">
-            <div class="page-title">
-                <i>📦</i>
-                <span>Semua Produk</span>
-            </div>
-            
-            <div class="cloud-card">
-                <input type="text" class="form-control mb-2" id="productsSearch" placeholder="Cari produk..." value="${filter}">
-                <div id="productsContainer"></div>
-            </div>
-        </div>
-    `;
-    
     const productsContainer = document.getElementById('productsContainer');
     productsContainer.innerHTML = '';
     
@@ -389,11 +320,6 @@ function renderProductsPage(filter = '') {
             });
         }
     });
-    
-    // Setup search event listener
-    document.getElementById('productsSearch').addEventListener('input', function() {
-        filterProducts();
-    });
 }
 
 function createProductCard(product) {
@@ -402,7 +328,6 @@ function createProductCard(product) {
     productCard.dataset.product = product.name;
     productCard.dataset.category = product.category;
     
-    // Cek apakah produk iOS
     const isIOS = product.tags && product.tags.includes('iOS');
     
     productCard.innerHTML = `
@@ -424,64 +349,59 @@ function createProductCard(product) {
 }
 
 function renderProductDetailPage(product) {
-    const pageContainer = document.getElementById('pageContainer');
+    const page = document.getElementById('product-detail-page');
     const packages = generatePackages(product.name, product.category);
     const processTime = getProcessTime(product.category);
     
-    // Cek apakah produk iOS
     const isIOS = product.tags && product.tags.includes('iOS');
     
-    pageContainer.innerHTML = `
-        <div class="page active" id="product-detail-page">
-            <div class="product-detail-header">
-                <div class="product-detail-icon" style="background: ${product.color}">
-                    ${product.icon}
-                </div>
-                <div class="product-detail-title">
-                    <h1>${product.name}</h1>
-                    <div class="product-detail-category">
-                        ${product.category} ${isIOS ? '• <span style="color: #FFB74D; font-weight: bold;">iOS</span>' : ''}
-                    </div>
+    page.innerHTML = `
+        <div class="product-detail-header">
+            <div class="product-detail-icon" style="background: ${product.color}">
+                ${product.icon}
+            </div>
+            <div class="product-detail-title">
+                <h1>${product.name}</h1>
+                <div class="product-detail-category">
+                    ${product.category} ${isIOS ? '• <span style="color: #FFB74D; font-weight: bold;">iOS</span>' : ''}
                 </div>
             </div>
+        </div>
+        
+        <div class="cloud-card">
+            <h3 style="margin-bottom: 15px; color: var(--primary);">Deskripsi</h3>
+            <p style="color: #555; line-height: 1.6; margin-bottom: 20px;">
+                ${productDescriptions[product.category]} Layanan ini memberikan akses penuh ke semua fitur premium.
+            </p>
             
-            <div class="cloud-card">
-                <h3 style="margin-bottom: 15px; color: var(--primary);">Deskripsi</h3>
-                <p style="color: #555; line-height: 1.6; margin-bottom: 20px;">
-                    ${productDescriptions[product.category]} Layanan ini memberikan akses penuh ke semua fitur premium.
-                </p>
-                
-                <h3 style="margin-bottom: 15px; color: var(--primary);">Pilih Paket</h3>
-                <div class="package-options" id="packageOptions">
-                    ${packages.map((pkg, index) => `
-                        <div class="package-option ${index === 1 ? 'selected' : ''}" data-index="${index}">
-                            <div class="package-header">
-                                <div class="package-name">${pkg.name}</div>
-                                <div class="package-price">Rp ${pkg.price.toLocaleString()}</div>
-                            </div>
-                            <ul class="package-features">
-                                ${pkg.features.map(feature => `<li><i>✓</i> ${feature}</li>`).join('')}
-                            </ul>
+            <h3 style="margin-bottom: 15px; color: var(--primary);">Pilih Paket</h3>
+            <div class="package-options" id="packageOptions">
+                ${packages.map((pkg, index) => `
+                    <div class="package-option ${index === 1 ? 'selected' : ''}" data-index="${index}">
+                        <div class="package-header">
+                            <div class="package-name">${pkg.name}</div>
+                            <div class="package-price">Rp ${pkg.price.toLocaleString()}</div>
                         </div>
-                    `).join('')}
-                </div>
-                
-                <button class="btn-buy ripple" id="btnBuyProduct">
-                    <i>🛒</i> Beli Sekarang
-                </button>
-                
-                <div class="process-info">
-                    <i>⏱️</i> Durasi proses: ${processTime}
-                </div>
+                        <ul class="package-features">
+                            ${pkg.features.map(feature => `<li><i>✓</i> ${feature}</li>`).join('')}
+                        </ul>
+                    </div>
+                `).join('')}
+            </div>
+            
+            <button class="btn-buy ripple" id="btnBuyProduct">
+                <i>🛒</i> Beli Sekarang
+            </button>
+            
+            <div class="process-info">
+                <i>⏱️</i> Durasi proses: ${processTime}
             </div>
         </div>
     `;
     
-    // Set selected product dan package
     appState.selectedProduct = product;
-    appState.selectedPackage = packages[1]; // Default pilih paket Plus (index 1)
+    appState.selectedPackage = packages[1];
     
-    // Setup event listeners untuk package options
     document.querySelectorAll('.package-option').forEach(option => {
         option.addEventListener('click', function() {
             document.querySelectorAll('.package-option').forEach(opt => opt.classList.remove('selected'));
@@ -490,256 +410,34 @@ function renderProductDetailPage(product) {
         });
     });
     
-    // Setup event listener untuk tombol beli
     document.getElementById('btnBuyProduct').addEventListener('click', () => {
         showPaymentModal('product');
     });
 }
 
 function renderDepositPage() {
-    const pageContainer = document.getElementById('pageContainer');
-    pageContainer.innerHTML = `
-        <div class="page active" id="deposit-page">
-            <div class="page-title">
-                <i>💵</i>
-                <span>Deposit Saldo</span>
-            </div>
-            
-            <div class="cloud-card">
-                <div id="depositFormContainer">
-                    <div class="deposit-form">
-                        <div class="form-group">
-                            <label>Nominal Deposit</label>
-                            <input type="number" class="form-control" id="depositAmount" placeholder="Masukkan nominal" min="10000" step="1000">
-                            <div class="amount-options">
-                                <div class="amount-option" data-amount="10000">10K</div>
-                                <div class="amount-option" data-amount="25000">25K</div>
-                                <div class="amount-option" data-amount="50000">50K</div>
-                                <div class="amount-option" data-amount="100000">100K</div>
-                                <div class="amount-option" data-amount="200000">200K</div>
-                                <div class="amount-option" data-amount="500000">500K</div>
-                                <div class="amount-option" data-amount="1000000">1JT</div>
-                                <div class="amount-option" data-amount="2000000">2JT</div>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Metode Pembayaran</label>
-                            <div class="payment-methods">
-                                <div class="payment-method" data-method="qris">
-                                    <div class="payment-icon">🏷️</div>
-                                    <div>QRIS</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <button class="btn-deposit ripple" id="btnCreatePayment">
-                            Buat Pembayaran QRIS
-                        </button>
-                    </div>
-                </div>
-                
-                <div id="invoiceContainer" class="hidden">
-                    <!-- Invoice will be populated by JS -->
-                </div>
-            </div>
-        </div>
-    `;
-    
-    // Reset state deposit
     appState.depositAmount = 0;
     appState.paymentMethod = null;
     appState.activeInvoice = null;
     
-    // Setup event listeners untuk deposit page
-    document.querySelectorAll('.amount-option').forEach(option => {
-        option.addEventListener('click', function() {
-            document.querySelectorAll('.amount-option').forEach(opt => opt.classList.remove('selected'));
-            this.classList.add('selected');
-            appState.depositAmount = parseInt(this.dataset.amount);
-            document.getElementById('depositAmount').value = appState.depositAmount;
-        });
-    });
+    document.getElementById('depositFormContainer').classList.remove('hidden');
+    document.getElementById('invoiceContainer').classList.add('hidden');
     
-    document.querySelectorAll('.payment-method').forEach(method => {
-        method.addEventListener('click', function() {
-            document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
-            this.classList.add('selected');
-            appState.paymentMethod = this.dataset.method;
-        });
-    });
-    
-    document.getElementById('depositAmount').addEventListener('input', function() {
-        appState.depositAmount = parseInt(this.value) || 0;
-    });
-    
-    document.getElementById('btnCreatePayment').addEventListener('click', createQrisPayment);
-    
-    // Cek apakah ada invoice aktif
-    const activeInvoice = appState.invoices.find(inv => inv.status === 'PENDING');
-    if (activeInvoice) {
-        appState.activeInvoice = activeInvoice;
-        renderInvoice(activeInvoice);
-    }
-}
-
-async function createQrisPayment() {
-    if (appState.depositAmount < 10000) {
-        showToast('Minimum deposit Rp 10.000', 'error');
-        return;
-    }
-    
-    // Tampilkan loader
-    showLoader();
-    
-    try {
-        // Panggil API PaksaSir untuk membuat pembayaran QRIS
-        const response = await fetchPaymentAPI('create', {
-            amount: appState.depositAmount,
-            method: 'qris',
-            customer_email: appState.user.email,
-            customer_name: appState.user.name
-        });
-        
-        if (response.success) {
-            // Generate invoice ID
-            const now = new Date();
-            const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
-            const randomNum = Math.floor(1000 + Math.random() * 9000);
-            const invoiceId = `INV-${dateStr}-${randomNum}`;
-            
-            // Create invoice
-            const invoice = {
-                id: invoiceId,
-                amount: appState.depositAmount,
-                method: 'qris',
-                status: 'PENDING',
-                createdAt: now.getTime(),
-                qrCode: response.qr_code || 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + response.payment_url,
-                paymentUrl: response.payment_url,
-                reference: response.reference_id
-            };
-            
-            // Add to invoices
-            appState.invoices.push(invoice);
-            appState.activeInvoice = invoice;
-            
-            // Save state
-            saveStateToStorage();
-            
-            // Render invoice
-            renderInvoice(invoice);
-            
-            // Add transaction record
-            addTransaction({
-                type: 'deposit',
-                amount: appState.depositAmount,
-                description: `Deposit via QRIS`,
-                status: 'PENDING',
-                timestamp: now.getTime(),
-                reference: response.reference_id
-            });
-            
-            showToast('Invoice QRIS berhasil dibuat', 'success', 'Scan QR Code untuk melanjutkan pembayaran');
-            
-            // Mulai polling untuk cek status pembayaran
-            startPaymentPolling(invoiceId, response.reference_id);
-        } else {
-            showToast('Gagal membuat pembayaran', 'error', response.message || 'Silakan coba lagi');
-        }
-    } catch (error) {
-        console.error('Payment creation error:', error);
-        showToast('Terjadi kesalahan', 'error', 'Silakan coba lagi nanti');
-        
-        // Fallback ke simulasi jika API gagal
-        simulateQrisPayment();
-    } finally {
-        hideLoader();
-    }
-}
-
-function simulateQrisPayment() {
-    // Generate invoice ID
-    const now = new Date();
-    const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
-    const randomNum = Math.floor(1000 + Math.random() * 9000);
-    const invoiceId = `INV-${dateStr}-${randomNum}`;
-    
-    // Create invoice
-    const invoice = {
-        id: invoiceId,
-        amount: appState.depositAmount,
-        method: 'qris',
-        status: 'PENDING',
-        createdAt: now.getTime(),
-        qrCode: 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=FLYSTORE-' + invoiceId,
-        paymentUrl: '#',
-        reference: 'SIM-' + Math.random().toString(36).substr(2, 9).toUpperCase()
-    };
-    
-    // Add to invoices
-    appState.invoices.push(invoice);
-    appState.activeInvoice = invoice;
-    
-    // Save state
-    saveStateToStorage();
-    
-    // Render invoice
-    renderInvoice(invoice);
-    
-    // Add transaction record
-    addTransaction({
-        type: 'deposit',
-        amount: appState.depositAmount,
-        description: `Deposit via QRIS`,
-        status: 'PENDING',
-        timestamp: now.getTime(),
-        reference: invoice.reference
-    });
-    
-    showToast('Invoice QRIS berhasil dibuat (Simulasi)', 'success', 'Scan QR Code untuk simulasi pembayaran');
-    
-    // Mulai polling untuk cek status pembayaran
-    startPaymentPolling(invoiceId, invoice.reference);
-}
-
-async function fetchPaymentAPI(action, data) {
-    // Ini adalah contoh implementasi. Untuk produksi, panggil server backend Anda
-    // JANGAN taruh API key di frontend JavaScript!
-    
-    if (action === 'create') {
-        // Simulasi response API
-        return {
-            success: true,
-            qr_code: 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=FLYSTORE-' + Date.now(),
-            payment_url: 'https://paksa.sir/pay/' + Math.random().toString(36).substr(2, 9),
-            reference_id: 'REF-' + Date.now(),
-            message: 'QRIS payment created successfully'
-        };
-    } else if (action === 'check') {
-        // Simulasi cek status
-        const isPaid = Math.random() > 0.7; // 30% chance paid
-        return {
-            success: true,
-            status: isPaid ? 'PAID' : 'PENDING',
-            paid_at: isPaid ? new Date().toISOString() : null
-        };
-    }
-    
-    throw new Error('Invalid API action');
+    document.querySelectorAll('.amount-option').forEach(opt => opt.classList.remove('selected'));
+    document.querySelectorAll('.payment-method').forEach(method => method.classList.remove('selected'));
+    document.getElementById('depositAmount').value = '';
 }
 
 function renderInvoice(invoice) {
-    const invoiceContainer = document.getElementById('invoiceContainer');
+    const container = document.getElementById('invoiceContainer');
     const now = new Date();
-    const expiryTime = new Date(invoice.createdAt + 10 * 60000); // 10 menit dari waktu pembuatan
+    const expiryTime = new Date(invoice.createdAt + 10 * 60000);
     
-    // Hitung countdown
     const timeLeft = Math.max(0, expiryTime - now);
     const minutes = Math.floor(timeLeft / 60000);
     const seconds = Math.floor((timeLeft % 60000) / 1000);
     
-    invoiceContainer.innerHTML = `
+    container.innerHTML = `
         <div class="invoice-card">
             <div class="invoice-id">${invoice.id}</div>
             <div class="invoice-status status-${invoice.status.toLowerCase()}">
@@ -766,14 +464,16 @@ function renderInvoice(invoice) {
                 </ol>
                 
                 <div style="text-align: center; margin: 20px 0;">
-                    <img src="${invoice.qrCode}" alt="QR Code Pembayaran" style="width: 200px; height: 200px; border: 2px solid white; border-radius: 10px;">
+                    <img src="${invoice.qrCode || 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=FLYSTORE-' + invoice.id}" 
+                         alt="QR Code Pembayaran" 
+                         style="width: 200px; height: 200px; border: 2px solid white; border-radius: 10px;">
                     <p style="font-size: 12px; color: rgba(255, 255, 255, 0.6); margin-top: 10px;">Scan QR Code di atas</p>
                 </div>
                 
                 <div style="background: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 10px; margin-top: 15px;">
                     <p style="color: white; margin-bottom: 5px;"><strong>Butuh Bantuan?</strong></p>
                     <p style="color: rgba(255, 255, 255, 0.8); font-size: 14px;">
-                        Jika mengalami masalah, hubungi Admin via WhatsApp:
+                        Hubungi Admin via WhatsApp:
                         <a href="https://wa.me/6281234567890?text=Halo%20Admin%20FlyStore%2C%20saya%20butuh%20bantuan%20untuk%20invoice%20${invoice.id}" 
                            style="color: var(--accent); text-decoration: none; font-weight: bold;" target="_blank">
                             📱 Chat Admin
@@ -794,13 +494,11 @@ function renderInvoice(invoice) {
         </div>
     `;
     
-    // Setup event listeners
     if (invoice.status === 'PENDING') {
         document.getElementById('btnSimulatePayment').addEventListener('click', () => {
             simulatePaymentSuccess(invoice.id);
         });
         
-        // Start countdown timer
         if (timeLeft > 0) {
             startInvoiceTimer(invoice.id, expiryTime);
         } else {
@@ -812,146 +510,8 @@ function renderInvoice(invoice) {
         renderDepositPage();
     });
     
-    // Tampilkan invoice container
     document.getElementById('depositFormContainer').classList.add('hidden');
-    invoiceContainer.classList.remove('hidden');
-}
-
-async function startPaymentPolling(invoiceId, referenceId) {
-    // Polling setiap 10 detik untuk cek status pembayaran
-    const pollInterval = setInterval(async () => {
-        try {
-            const response = await fetchPaymentAPI('check', { reference_id: referenceId });
-            
-            if (response.success && response.status === 'PAID') {
-                clearInterval(pollInterval);
-                updateInvoiceStatus(invoiceId, 'PAID', response.paid_at);
-            }
-        } catch (error) {
-            console.error('Polling error:', error);
-        }
-        
-        // Hentikan polling setelah 10 menit
-        setTimeout(() => {
-            clearInterval(pollInterval);
-            const invoice = appState.invoices.find(inv => inv.id === invoiceId);
-            if (invoice && invoice.status === 'PENDING') {
-                expireInvoice(invoiceId);
-            }
-        }, 10 * 60 * 1000); // 10 menit
-    }, 10000); // Poll setiap 10 detik
-}
-
-function updateInvoiceStatus(invoiceId, status, paidAt = null) {
-    const invoice = appState.invoices.find(inv => inv.id === invoiceId);
-    if (!invoice) return;
-    
-    invoice.status = status;
-    if (paidAt) invoice.paidAt = paidAt;
-    
-    // Update transaction status
-    const transaction = appState.transactions.find(t => 
-        t.type === 'deposit' && t.amount === invoice.amount && t.status === 'PENDING'
-    );
-    if (transaction) {
-        transaction.status = 'SUCCESS';
-    }
-    
-    // Update balance jika pembayaran berhasil
-    if (status === 'PAID') {
-        appState.balance += invoice.amount;
-        updateBalanceDisplay();
-        showToast('Pembayaran berhasil!', 'success', `Saldo bertambah Rp ${invoice.amount.toLocaleString()}`);
-    }
-    
-    // Save state
-    saveStateToStorage();
-    
-    // Update UI jika invoice sedang ditampilkan
-    if (appState.activeInvoice && appState.activeInvoice.id === invoiceId) {
-        renderInvoice(invoice);
-    }
-    
-    updateTransactionsDisplay();
-}
-
-function simulatePaymentSuccess(invoiceId) {
-    updateInvoiceStatus(invoiceId, 'PAID', new Date().toISOString());
-}
-
-function startInvoiceTimer(invoiceId, expiryTime) {
-    const timerElement = document.getElementById('invoiceTimer');
-    if (!timerElement) return;
-    
-    const timerInterval = setInterval(() => {
-        const now = new Date();
-        const timeLeft = Math.max(0, expiryTime - now);
-        const minutes = Math.floor(timeLeft / 60000);
-        const seconds = Math.floor((timeLeft % 60000) / 1000);
-        
-        timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        
-        if (timeLeft <= 0) {
-            clearInterval(timerInterval);
-            expireInvoice(invoiceId);
-        }
-    }, 1000);
-}
-
-function expireInvoice(invoiceId) {
-    const invoice = appState.invoices.find(inv => inv.id === invoiceId);
-    if (!invoice || invoice.status !== 'PENDING') return;
-    
-    invoice.status = 'EXPIRED';
-    
-    // Update transaction status
-    const transaction = appState.transactions.find(t => 
-        t.type === 'deposit' && t.amount === invoice.amount && t.status === 'PENDING'
-    );
-    if (transaction) {
-        transaction.status = 'EXPIRED';
-    }
-    
-    saveStateToStorage();
-    
-    if (appState.activeInvoice && appState.activeInvoice.id === invoiceId) {
-        renderInvoice(invoice);
-    }
-    
-    showToast('Invoice telah kadaluarsa', 'warning', 'Waktu pembayaran telah habis');
-}
-
-function renderTransactionsPage() {
-    const pageContainer = document.getElementById('pageContainer');
-    pageContainer.innerHTML = `
-        <div class="page active" id="transactions-page">
-            <div class="page-title">
-                <i>📋</i>
-                <span>Riwayat Transaksi</span>
-            </div>
-            
-            <div class="cloud-card">
-                <div class="transaction-filters">
-                    <div class="transaction-filter active" data-filter="all">Semua</div>
-                    <div class="transaction-filter" data-filter="deposit">Deposit</div>
-                    <div class="transaction-filter" data-filter="purchase">Pembelian</div>
-                </div>
-                
-                <div class="transactions-list" id="transactionsList"></div>
-            </div>
-        </div>
-    `;
-    
-    updateTransactionsDisplay();
-    
-    // Setup filter event listeners
-    document.querySelectorAll('.transaction-filter').forEach(filter => {
-        filter.addEventListener('click', function() {
-            document.querySelectorAll('.transaction-filter').forEach(f => f.classList.remove('active'));
-            this.classList.add('active');
-            updateTransactionsDisplay(this.dataset.filter);
-        });
-    });
+    container.classList.remove('hidden');
 }
 
 function updateTransactionsDisplay(filter = 'all') {
@@ -960,7 +520,6 @@ function updateTransactionsDisplay(filter = 'all') {
     
     transactionsList.innerHTML = '';
     
-    // Filter transaksi
     let filteredTransactions = [];
     if (filter === 'all') {
         filteredTransactions = appState.transactions;
@@ -970,7 +529,6 @@ function updateTransactionsDisplay(filter = 'all') {
         filteredTransactions = appState.transactions.filter(t => t.type === 'purchase');
     }
     
-    // Urutkan berdasarkan tanggal (terbaru dulu)
     filteredTransactions.sort((a, b) => b.timestamp - a.timestamp);
     
     if (filteredTransactions.length === 0) {
@@ -999,9 +557,8 @@ function updateTransactionsDisplay(filter = 'all') {
         transactionItem.innerHTML = `
             <div class="transaction-info">
                 <h4>${transaction.description}</h4>
-                <p>${formattedDate} • <span class="status-${transaction.status.toLowerCase()}">${transaction.status}</span></p>
+                <p>${formattedDate} • ${transaction.status}</p>
                 ${transaction.productName ? `<p style="font-size: 0.8rem; color: var(--primary);">${transaction.productName} - ${transaction.packageName}</p>` : ''}
-                ${transaction.reference ? `<p style="font-size: 0.7rem; color: var(--gray);">Ref: ${transaction.reference}</p>` : ''}
             </div>
             <div class="transaction-amount ${transaction.type === 'deposit' ? 'transaction-deposit' : 'transaction-purchase'}">
                 ${transaction.type === 'deposit' ? '+' : '-'} Rp ${transaction.amount.toLocaleString()}
@@ -1010,56 +567,6 @@ function updateTransactionsDisplay(filter = 'all') {
         
         transactionsList.appendChild(transactionItem);
     });
-}
-
-function renderAccountPage() {
-    const pageContainer = document.getElementById('pageContainer');
-    pageContainer.innerHTML = `
-        <div class="page active" id="account-page">
-            <div class="page-title">
-                <i>👤</i>
-                <span>Akun Saya</span>
-            </div>
-            
-            <div class="account-header">
-                <div class="account-avatar" id="accountAvatar">
-                    ${appState.user.initial}
-                </div>
-                <h2 class="account-name" id="accountName">${appState.user.name}</h2>
-                <p class="account-email" id="accountEmail">${appState.user.email}</p>
-            </div>
-            
-            <div class="cloud-card account-balance-card">
-                <div class="balance-label">Saldo Anda</div>
-                <div class="balance-amount" id="accountBalance">Rp ${appState.balance.toLocaleString()}</div>
-            </div>
-            
-            <div class="account-actions">
-                <div class="account-action ripple" id="btnLogin">
-                    <div class="action-icon">🔐</div>
-                    <div>Masuk</div>
-                </div>
-                <div class="account-action ripple" id="btnLogout">
-                    <div class="action-icon">🚪</div>
-                    <div>Keluar</div>
-                </div>
-                <div class="account-action ripple" id="btnDepositFromAccount">
-                    <div class="action-icon">💰</div>
-                    <div>Deposit</div>
-                </div>
-                <div class="account-action ripple" id="btnTransactionsFromAccount">
-                    <div class="action-icon">📋</div>
-                    <div>Riwayat</div>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    // Setup event listeners untuk account page
-    document.getElementById('btnLogin').addEventListener('click', showLoginModal);
-    document.getElementById('btnLogout').addEventListener('click', logout);
-    document.getElementById('btnDepositFromAccount').addEventListener('click', () => navigateToPage('deposit'));
-    document.getElementById('btnTransactionsFromAccount').addEventListener('click', () => navigateToPage('transactions'));
 }
 
 function updateBalanceDisplay() {
@@ -1081,21 +588,10 @@ function updateUserDisplay() {
     const accountName = document.getElementById('accountName');
     const accountEmail = document.getElementById('accountEmail');
     
-    if (accountInitial) {
-        accountInitial.textContent = appState.user.initial;
-    }
-    
-    if (accountAvatar) {
-        accountAvatar.textContent = appState.user.initial;
-    }
-    
-    if (accountName) {
-        accountName.textContent = appState.user.name;
-    }
-    
-    if (accountEmail) {
-        accountEmail.textContent = appState.user.email;
-    }
+    if (accountInitial) accountInitial.textContent = appState.user.initial;
+    if (accountAvatar) accountAvatar.textContent = appState.user.initial;
+    if (accountName) accountName.textContent = appState.user.name;
+    if (accountEmail) accountEmail.textContent = appState.user.email;
 }
 
 // ============================================
@@ -1111,28 +607,62 @@ function setupEventListeners() {
         });
     });
     
-    // Search input
-    document.getElementById('searchInput').addEventListener('input', filterProducts);
-    
-    // Account button
-    document.getElementById('accountBtn').addEventListener('click', () => navigateToPage('account'));
+    // Account actions
+    document.getElementById('btnLogin').addEventListener('click', showLoginModal);
+    document.getElementById('btnLogout').addEventListener('click', logout);
+    document.getElementById('btnDepositFromAccount').addEventListener('click', () => navigateToPage('deposit'));
+    document.getElementById('btnTransactionsFromAccount').addEventListener('click', () => navigateToPage('transactions'));
     
     // Login modal
-    document.getElementById('closeLoginModal')?.addEventListener('click', hideLoginModal);
-    document.getElementById('closeLoginModal2')?.addEventListener('click', hideLoginModal);
-    document.getElementById('btnLoginSubmit')?.addEventListener('click', login);
+    document.getElementById('closeLoginModal').addEventListener('click', hideLoginModal);
+    document.getElementById('closeLoginModal2').addEventListener('click', hideLoginModal);
+    document.getElementById('btnLoginSubmit').addEventListener('click', login);
+    
+    // Search input
+    document.getElementById('searchInput').addEventListener('input', filterProducts);
+    document.getElementById('productsSearch')?.addEventListener('input', filterProducts);
+    
+    // Deposit page
+    document.querySelectorAll('.amount-option').forEach(option => {
+        option.addEventListener('click', function() {
+            document.querySelectorAll('.amount-option').forEach(opt => opt.classList.remove('selected'));
+            this.classList.add('selected');
+            appState.depositAmount = parseInt(this.dataset.amount);
+            document.getElementById('depositAmount').value = appState.depositAmount;
+        });
+    });
+    
+    document.querySelectorAll('.payment-method').forEach(method => {
+        method.addEventListener('click', function() {
+            document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
+            this.classList.add('selected');
+            appState.paymentMethod = this.dataset.method;
+        });
+    });
+    
+    document.getElementById('depositAmount')?.addEventListener('input', function() {
+        appState.depositAmount = parseInt(this.value) || 0;
+    });
+    
+    document.getElementById('btnCreatePayment')?.addEventListener('click', createQrisPayment);
     
     // Payment modal
     document.getElementById('closePaymentModal')?.addEventListener('click', hidePaymentModal);
     document.getElementById('closePaymentModal2')?.addEventListener('click', hidePaymentModal);
     document.getElementById('btnConfirmPayment')?.addEventListener('click', confirmPayment);
+    
+    // Transaction filters
+    document.querySelectorAll('.transaction-filter').forEach(filter => {
+        filter.addEventListener('click', function() {
+            document.querySelectorAll('.transaction-filter').forEach(f => f.classList.remove('active'));
+            this.classList.add('active');
+            updateTransactionsDisplay(this.dataset.filter);
+        });
+    });
 }
 
 function setupRouting() {
-    // Handle hash change untuk SPA routing
     window.addEventListener('hashchange', handleRouting);
-    
-    // Initial routing
     handleRouting();
 }
 
@@ -1150,17 +680,21 @@ function handleRouting() {
         }
     });
     
-    // Show loader
+    // Hide all pages
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    
     showLoader();
     
-    // Navigate berdasarkan halaman
     setTimeout(() => {
         if (page === 'home') {
+            document.getElementById('home-page').classList.add('active');
             renderHomePage();
         } else if (page === 'products') {
+            document.getElementById('products-page').classList.add('active');
             renderProductsPage();
         } else if (page === 'product' && param) {
-            // Cari produk berdasarkan slug
+            document.getElementById('product-detail-page').classList.add('active');
+            
             let foundProduct = null;
             Object.keys(productsData).forEach(category => {
                 productsData[category].forEach(product => {
@@ -1174,27 +708,41 @@ function handleRouting() {
             if (foundProduct) {
                 renderProductDetailPage(foundProduct);
             } else {
-                // Fallback ke halaman produk jika tidak ditemukan
                 navigateToPage('products');
             }
         } else if (page === 'deposit') {
+            document.getElementById('deposit-page').classList.add('active');
             renderDepositPage();
+            
+            const activeInvoice = appState.invoices.find(inv => inv.status === 'PENDING');
+            if (activeInvoice) {
+                appState.activeInvoice = activeInvoice;
+                renderInvoice(activeInvoice);
+            }
         } else if (page === 'tx' || page === 'transactions') {
-            renderTransactionsPage();
+            document.getElementById('transactions-page').classList.add('active');
+            updateTransactionsDisplay();
         } else if (page === 'account') {
-            renderAccountPage();
+            document.getElementById('account-page').classList.add('active');
+            updateUserDisplay();
+            updateBalanceDisplay();
         } else {
-            // Default ke home
             navigateToPage('home');
         }
         
-        // Hide loader
         hideLoader();
     }, 300);
 }
 
 function setupBannerSlider() {
-    // Banner slider akan di-setup saat renderHomePage
+    const slides = document.querySelectorAll('.banner-slide');
+    let currentSlide = 0;
+    
+    setInterval(() => {
+        slides[currentSlide].classList.remove('active');
+        currentSlide = (currentSlide + 1) % slides.length;
+        slides[currentSlide].classList.add('active');
+    }, 4000);
 }
 
 function generateSparkles() {
@@ -1220,22 +768,17 @@ function navigateToPage(page) {
 }
 
 function showLoader() {
-    const loader = document.getElementById('loader');
-    if (loader) loader.classList.add('active');
+    document.getElementById('loader').classList.add('active');
 }
 
 function hideLoader() {
-    const loader = document.getElementById('loader');
-    if (loader) loader.classList.remove('active');
+    document.getElementById('loader').classList.remove('active');
 }
 
 function filterProducts() {
     const searchTerm = document.getElementById('productsSearch')?.value || 
                       document.getElementById('searchInput')?.value || '';
-    
-    if (window.location.hash.substring(1).startsWith('products')) {
-        renderProductsPage(searchTerm);
-    }
+    renderProductsPage(searchTerm);
 }
 
 function showLoginModal() {
@@ -1260,11 +803,6 @@ function login() {
     updateUserDisplay();
     hideLoginModal();
     showToast('Berhasil masuk!', 'success', `Selamat datang, ${appState.user.name}!`);
-    
-    // Refresh account page jika sedang di halaman account
-    if (window.location.hash.substring(1) === 'account') {
-        renderAccountPage();
-    }
 }
 
 function logout() {
@@ -1277,11 +815,141 @@ function logout() {
     saveStateToStorage();
     updateUserDisplay();
     showToast('Anda telah keluar', 'info');
-    
-    // Refresh account page jika sedang di halaman account
-    if (window.location.hash.substring(1) === 'account') {
-        renderAccountPage();
+}
+
+function createQrisPayment() {
+    if (appState.depositAmount < 10000) {
+        showToast('Minimum deposit Rp 10.000', 'error');
+        return;
     }
+    
+    if (!appState.paymentMethod) {
+        showToast('Pilih metode pembayaran', 'error');
+        return;
+    }
+    
+    showLoader();
+    
+    // Simulasi pembuatan pembayaran QRIS
+    setTimeout(() => {
+        const now = new Date();
+        const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
+        const randomNum = Math.floor(1000 + Math.random() * 9000);
+        const invoiceId = `INV-${dateStr}-${randomNum}`;
+        
+        const invoice = {
+            id: invoiceId,
+            amount: appState.depositAmount,
+            method: 'qris',
+            status: 'PENDING',
+            createdAt: now.getTime(),
+            qrCode: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=FLYSTORE-${invoiceId}-${appState.depositAmount}`,
+            reference: 'REF-' + Math.random().toString(36).substr(2, 9).toUpperCase()
+        };
+        
+        appState.invoices.push(invoice);
+        appState.activeInvoice = invoice;
+        
+        saveStateToStorage();
+        renderInvoice(invoice);
+        
+        addTransaction({
+            type: 'deposit',
+            amount: appState.depositAmount,
+            description: `Deposit via QRIS`,
+            status: 'PENDING',
+            timestamp: now.getTime(),
+            reference: invoice.reference
+        });
+        
+        showToast('Invoice QRIS berhasil dibuat', 'success', 'Scan QR Code untuk melanjutkan pembayaran');
+        hideLoader();
+        
+        // Mulai polling untuk cek status pembayaran
+        startPaymentPolling(invoiceId);
+    }, 1000);
+}
+
+function simulatePaymentSuccess(invoiceId) {
+    const invoice = appState.invoices.find(inv => inv.id === invoiceId);
+    if (!invoice) return;
+    
+    invoice.status = 'PAID';
+    
+    const transaction = appState.transactions.find(t => 
+        t.type === 'deposit' && t.amount === invoice.amount && t.status === 'PENDING'
+    );
+    if (transaction) {
+        transaction.status = 'SUCCESS';
+    }
+    
+    appState.balance += invoice.amount;
+    
+    saveStateToStorage();
+    updateBalanceDisplay();
+    renderInvoice(invoice);
+    updateTransactionsDisplay();
+    
+    showToast('Pembayaran berhasil!', 'success', `Saldo bertambah Rp ${invoice.amount.toLocaleString()}`);
+}
+
+function startPaymentPolling(invoiceId) {
+    const pollInterval = setInterval(() => {
+        const invoice = appState.invoices.find(inv => inv.id === invoiceId);
+        if (!invoice || invoice.status !== 'PENDING') {
+            clearInterval(pollInterval);
+            return;
+        }
+        
+        // Simulasi: 30% chance pembayaran berhasil
+        if (Math.random() < 0.3) {
+            clearInterval(pollInterval);
+            simulatePaymentSuccess(invoiceId);
+        }
+        
+        // Hentikan polling setelah 10 menit
+    }, 10000);
+}
+
+function startInvoiceTimer(invoiceId, expiryTime) {
+    const timerElement = document.getElementById('invoiceTimer');
+    if (!timerElement) return;
+    
+    const timerInterval = setInterval(() => {
+        const now = new Date();
+        const timeLeft = Math.max(0, expiryTime - now);
+        const minutes = Math.floor(timeLeft / 60000);
+        const seconds = Math.floor((timeLeft % 60000) / 1000);
+        
+        timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            expireInvoice(invoiceId);
+        }
+    }, 1000);
+}
+
+function expireInvoice(invoiceId) {
+    const invoice = appState.invoices.find(inv => inv.id === invoiceId);
+    if (!invoice || invoice.status !== 'PENDING') return;
+    
+    invoice.status = 'EXPIRED';
+    
+    const transaction = appState.transactions.find(t => 
+        t.type === 'deposit' && t.amount === invoice.amount && t.status === 'PENDING'
+    );
+    if (transaction) {
+        transaction.status = 'EXPIRED';
+    }
+    
+    saveStateToStorage();
+    
+    if (appState.activeInvoice && appState.activeInvoice.id === invoiceId) {
+        renderInvoice(invoice);
+    }
+    
+    showToast('Invoice telah kadaluarsa', 'warning', 'Waktu pembayaran telah habis');
 }
 
 function addTransaction(transaction) {
@@ -1346,17 +1014,14 @@ function confirmPayment() {
         return;
     }
     
-    // Cek saldo
     if (appState.balance < appState.selectedPackage.price) {
         showToast('Saldo tidak cukup', 'error', 'Silakan deposit terlebih dahulu');
         setTimeout(() => navigateToPage('deposit'), 1500);
         return;
     }
     
-    // Kurangi saldo
     appState.balance -= appState.selectedPackage.price;
     
-    // Tambahkan transaksi
     addTransaction({
         type: 'purchase',
         amount: appState.selectedPackage.price,
@@ -1367,17 +1032,12 @@ function confirmPayment() {
         packageName: appState.selectedPackage.name
     });
     
-    // Save state
     saveStateToStorage();
-    
-    // Update UI
     updateBalanceDisplay();
     updateTransactionsDisplay();
     
-    // Show success message
     showToast('Pembelian berhasil!', 'success', `${appState.selectedProduct.name} sedang diproses`);
     
-    // Navigate back to products after delay
     setTimeout(() => navigateToPage('products'), 2000);
 }
 
@@ -1399,10 +1059,8 @@ function showToast(title, type, message = '') {
     
     toastContainer.appendChild(toast);
     
-    // Trigger animation
     setTimeout(() => toast.classList.add('show'), 10);
     
-    // Remove toast after 5 seconds
     setTimeout(() => {
         toast.classList.remove('show');
         setTimeout(() => {
